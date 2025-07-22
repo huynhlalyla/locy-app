@@ -94,7 +94,7 @@ class PlaceCard extends StatelessWidget {
                         final result = await CustomDialogs.showEditDialog(
                           context: context,
                           itemName: place.name,
-                          title: 'Thay đổi địa điểm',
+                          title: 'Chỉnh sửa địa điểm',
                         );
                         if (result == true) {
                           onEdit?.call();

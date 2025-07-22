@@ -166,15 +166,15 @@ class CustomDialogs {
   static Future<bool?> showEditDialog({
     required BuildContext context,
     required String itemName,
-    String title = 'Thay đổi',
+    String title = 'Chỉnh sửa',
   }) {
     return showConfirmDialog(
       context: context,
       title: title,
-      message: 'Bạn muốn thay đổi "$itemName"?',
+      message: 'Bạn muốn chỉnh sửa "$itemName"?',
       icon: Icons.edit,
       iconColor: Colors.blue,
-      confirmText: 'Đồng ý',
+      confirmText: 'Chỉnh sửa',
       useGradient: true,
     );
   }

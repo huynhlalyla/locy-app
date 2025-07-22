@@ -3,7 +3,7 @@ import '../models/place.dart';
 import '../services/storage_service.dart';
 import '../widgets/place_card.dart';
 import 'map_picker_screen.dart';
-import 'add_place_screen.dart';
+import 'edit_place_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../main.dart'; // Import để sử dụng routeObserver
 
@@ -115,27 +115,19 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _editPlace(Place place) async {
-    // Xóa dữ liệu cũ trước khi chuyển trang
-    await _storageService.deletePlace(place.id);
-    _loadPlaces();
-
-    // Chuyển thẳng đến trang thêm địa điểm với kinh độ và vĩ độ cũ
+    // Chuyển đến trang chỉnh sửa với dữ liệu hiện tại
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddPlaceScreen(
-          latitude: place.latitude,
-          longitude: place.longitude,
-        ),
+        builder: (context) => EditPlaceScreen(place: place),
       ),
     );
-
+    
+    // Nếu cập nhật thành công, refresh danh sách
     if (result == true) {
       _loadPlaces();
     }
-  }
-
-  @override
+  }  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -157,21 +149,6 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
         ),
-        actions: [
-          // Thêm nút test chức năng chia sẻ
-          // IconButton(
-          //   icon: const Icon(Icons.bug_report, color: Colors.white),
-          //   onPressed: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => const LocationShareTestScreen(),
-          //       ),
-          //     );
-          //   },
-          //   tooltip: 'Test Location Share',
-          // ),
-        ],
       ),
       body: Container(
         decoration: const BoxDecoration(

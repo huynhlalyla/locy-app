@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 // import 'package:flutter/services.dart';
-import 'screens/home_screen.dart';
+import 'screens/splash_screen.dart';
 import 'screens/add_place_screen.dart';
 import 'services/location_share_service.dart';
 import 'services/shared_data_state.dart';
@@ -178,7 +178,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           foregroundColor: Colors.white,
         ),
       ),
-      home: const HomeScreen(),
+      home: const SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

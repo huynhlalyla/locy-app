@@ -1,0 +1,24 @@
+# Set default line ending behavior
+* text=auto
+
+# Ensure these file types always have LF line endings
+*.dart text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+
+# Ensure these file types always have CRLF line endings on checkout
+*.bat text eol=crlf
+
+# Binary files should not be processed
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.zip binary
+*.apk binary
+*.aab binary
+*.so binary
+*.jar binary

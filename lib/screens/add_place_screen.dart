@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/place.dart';
 import '../services/storage_service.dart';
 import '../utils/place_icon_utils.dart';
+import '../widgets/custom_dialogs.dart';
 
 class AddPlaceScreen extends StatefulWidget {
   final double latitude;
@@ -17,7 +18,8 @@ class AddPlaceScreen extends StatefulWidget {
   State<AddPlaceScreen> createState() => _AddPlaceScreenState();
 }
 
-class _AddPlaceScreenState extends State<AddPlaceScreen> with SingleTickerProviderStateMixin {
+class _AddPlaceScreenState extends State<AddPlaceScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _noteController = TextEditingController();
@@ -35,13 +37,9 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> with SingleTickerProvid
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
     _animationController.forward();
   }
 
@@ -67,7 +65,9 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> with SingleTickerProvid
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: _nameController.text.trim(),
         type: _selectedType,
-        note: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
+        note: _noteController.text.trim().isEmpty
+            ? null
+            : _noteController.text.trim(),
         latitude: widget.latitude,
         longitude: widget.longitude,
         createdAt: DateTime.now(),
@@ -77,62 +77,28 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> with SingleTickerProvid
 
       if (mounted) {
         if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.check_circle, color: Colors.white),
-                  const SizedBox(width: 8),
-                  const Text('Đã lưu địa điểm thành công!'),
-                ],
-              ),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              margin: const EdgeInsets.all(16),
-            ),
+          // Hiển thị dialog thành công
+          await CustomDialogs.showSuccessDialog(
+            context: context,
+            message: 'Đã lưu địa điểm thành công!',
           );
 
           // Quay về trang home và refresh dữ liệu
           Navigator.of(context).popUntil((route) => route.isFirst);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.error, color: Colors.white),
-                  const SizedBox(width: 8),
-                  const Text('Lỗi khi lưu địa điểm!'),
-                ],
-              ),
-              backgroundColor: Colors.red,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
+          // Hiển thị dialog lỗi
+          await CustomDialogs.showErrorDialog(
+            context: context,
+            message: 'Lỗi khi lưu địa điểm!',
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.error, color: Colors.white),
-                const SizedBox(width: 8),
-                Text('Lỗi: ${e.toString()}'),
-              ],
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
+        // Hiển thị dialog lỗi
+        await CustomDialogs.showErrorDialog(
+          context: context,
+          message: 'Lỗi: ${e.toString()}',
         );
       }
     } finally {
@@ -289,11 +255,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> with SingleTickerProvid
                   ),
                   child: Column(
                     children: [
-                      const Icon(
-                        Icons.place,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+                      const Icon(Icons.place, color: Colors.white, size: 20),
                       const SizedBox(height: 8),
                       const Text(
                         'Kinh độ',
@@ -365,11 +327,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> with SingleTickerProvid
                     color: Colors.blue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
-                    Icons.place,
-                    color: Colors.blue,
-                    size: 20,
-                  ),
+                  child: const Icon(Icons.place, color: Colors.blue, size: 20),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -377,7 +335,10 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> with SingleTickerProvid
                 ),
                 filled: true,
                 fillColor: Colors.grey.shade50,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
@@ -414,11 +375,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> with SingleTickerProvid
                     color: Colors.orange.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
-                    Icons.note,
-                    color: Colors.orange,
-                    size: 20,
-                  ),
+                  child: const Icon(Icons.note, color: Colors.orange, size: 20),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -426,7 +383,10 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> with SingleTickerProvid
                 ),
                 filled: true,
                 fillColor: Colors.grey.shade50,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
               ),
               maxLines: 3,
               textInputAction: TextInputAction.done,
@@ -540,11 +500,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> with SingleTickerProvid
             : const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.save,
-                    color: Colors.white,
-                    size: 20,
-                  ),
+                  Icon(Icons.save, color: Colors.white, size: 20),
                   SizedBox(width: 8),
                   Text(
                     'Lưu địa điểm',

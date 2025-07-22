@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import '../models/place.dart';
 import '../utils/place_icon_utils.dart';
+import 'custom_dialogs.dart';
 
 class PlaceCard extends StatelessWidget {
   final Place place;
   final VoidCallback? onDelete;
   final VoidCallback? onTap;
+  final VoidCallback? onEdit;
 
   const PlaceCard({
     Key? key,
     required this.place,
     this.onDelete,
     this.onTap,
+    this.onEdit,
   }) : super(key: key);
 
   @override
@@ -19,9 +22,7 @@ class PlaceCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -30,10 +31,7 @@ class PlaceCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             gradient: LinearGradient(
-              colors: [
-                Colors.white,
-                Colors.grey.shade50,
-              ],
+              colors: [Colors.white, Colors.grey.shade50],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -46,7 +44,9 @@ class PlaceCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: PlaceIconUtils.getColor(place.type).withOpacity(0.1),
+                      color: PlaceIconUtils.getColor(
+                        place.type,
+                      ).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -86,11 +86,34 @@ class PlaceCard extends StatelessWidget {
                     onPressed: onTap,
                     tooltip: 'Chỉ đường',
                   ),
+                  // Thêm nút sửa
+                  if (onEdit != null)
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.blue),
+                      onPressed: () async {
+                        final result = await CustomDialogs.showEditDialog(
+                          context: context,
+                          itemName: place.name,
+                          title: 'Thay đổi địa điểm',
+                        );
+                        if (result == true) {
+                          onEdit?.call();
+                        }
+                      },
+                      tooltip: 'Sửa',
+                    ),
                   if (onDelete != null)
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () {
-                        _showDeleteDialog(context);
+                      onPressed: () async {
+                        final result = await CustomDialogs.showDeleteDialog(
+                          context: context,
+                          itemName: place.name,
+                          title: 'Xóa địa điểm',
+                        );
+                        if (result == true) {
+                          onDelete?.call();
+                        }
                       },
                     ),
                 ],
@@ -144,17 +167,17 @@ class PlaceCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     'Thêm vào: ${_formatDate(place.createdAt)}',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.black54,
-                    ),
+                    style: const TextStyle(fontSize: 12, color: Colors.black54),
                   ),
                 ],
               ),
               // Thêm dòng hướng dẫn tap để chỉ đường
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.green.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
@@ -178,29 +201,6 @@ class PlaceCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _showDeleteDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Xóa địa điểm'),
-        content: Text('Bạn có chắc chắn muốn xóa địa điểm "${place.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              onDelete?.call();
-            },
-            child: const Text('Xóa', style: TextStyle(color: Colors.red)),
-          ),
-        ],
       ),
     );
   }

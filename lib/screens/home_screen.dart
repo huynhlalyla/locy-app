@@ -3,6 +3,7 @@ import '../models/place.dart';
 import '../services/storage_service.dart';
 import '../widgets/place_card.dart';
 import 'map_picker_screen.dart';
+import 'add_place_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../main.dart'; // Import để sử dụng routeObserver
 
@@ -13,7 +14,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, RouteAware {
+class _HomeScreenState extends State<HomeScreen>
+    with WidgetsBindingObserver, RouteAware {
   final StorageService _storageService = StorageService();
   List<Place> _places = [];
   bool _isLoading = true;
@@ -85,11 +87,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Ro
     _loadPlaces();
   }
 
-  // Thêm method để được gọi khi route becomes active
-  void _onRouteResumed() {
-    _loadPlaces();
-  }
-
   // Thêm method để refresh từ bên ngoài
   Future<void> refreshPlaces() async {
     await _loadPlaces();
@@ -115,6 +112,27 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Ro
   Future<void> _deletePlace(String id) async {
     await _storageService.deletePlace(id);
     _loadPlaces();
+  }
+
+  Future<void> _editPlace(Place place) async {
+    // Xóa dữ liệu cũ trước khi chuyển trang
+    await _storageService.deletePlace(place.id);
+    _loadPlaces();
+
+    // Chuyển thẳng đến trang thêm địa điểm với kinh độ và vĩ độ cũ
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddPlaceScreen(
+          latitude: place.latitude,
+          longitude: place.longitude,
+        ),
+      ),
+    );
+
+    if (result == true) {
+      _loadPlaces();
+    }
   }
 
   @override
@@ -158,10 +176,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Ro
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFFE3F2FD),
-              Color(0xFFF3E5F5),
-            ],
+            colors: [Color(0xFFE3F2FD), Color(0xFFF3E5F5)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -173,9 +188,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Ro
             // Main content
             Expanded(
               child: _isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
+                  ? const Center(child: CircularProgressIndicator())
                   : RefreshIndicator(
                       onRefresh: _loadPlaces,
                       child: _places.isEmpty
@@ -190,9 +203,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Ro
         onPressed: () async {
           final result = await Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const MapPickerScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const MapPickerScreen()),
           );
           if (result == true) {
             _loadPlaces();
@@ -275,11 +286,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Ro
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.bookmark,
-                  size: 20,
-                  color: Colors.white,
-                ),
+                const Icon(Icons.bookmark, size: 20, color: Colors.white),
                 const SizedBox(width: 8),
                 Text(
                   '${_places.length} địa điểm đã lưu',
@@ -317,11 +324,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Ro
           ),
           child: Column(
             children: [
-              Icon(
-                Icons.location_off,
-                size: 80,
-                color: Colors.grey[400],
-              ),
+              Icon(Icons.location_off, size: 80, color: Colors.grey[400]),
               const SizedBox(height: 16),
               Text(
                 'Hiện chưa có địa điểm nào được lưu.',
@@ -335,10 +338,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Ro
               const SizedBox(height: 8),
               Text(
                 'Hãy thêm địa điểm mới nào!',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[500],
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey[500]),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -358,6 +358,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Ro
           place: place,
           onDelete: () => _deletePlace(place.id),
           onTap: () => _openInGoogleMaps(place),
+          onEdit: () => _editPlace(place),
         );
       },
     );
